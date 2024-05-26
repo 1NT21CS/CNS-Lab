@@ -1,132 +1,41 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-void encryptMessage(char *str, int rails);
-void decryptMessage(char *str, int rails);
-void encryptMessage(char *str, int rails) {
-int i, j, len, count, code[100][1000];
-len = strlen(str);
-for(i = 0; i < rails; i++) {
-for(j = 0; j < len; j++) {
-code[i][j] = 0;
-}
-}
-count = 0;
-j = 0;
-while(j < len) {
-if(count % 2 == 0) {
-for(i = 0; i < rails; i++) {
-if(j < len)
-code[i][j] = (int)str[j];
-j++;
-}
-} else {
-for(i = rails - 2; i > 0; i--) {
-if(j < len)
-code[i][j] = (int)str[j];
-j++;
-}
-}
-count++;
-}
-printf("Rail Fence Pattern:\n");
-for(i = 0; i < rails; i++) {
-for(j = 0; j < len; j++) {
-if(code[i][j] != 0)
-printf("%c ", code[i][j]);
-else
-printf(" ");
-}
-printf("\n");
-}
-printf("Encrypted Message: ");
-for(i = 0; i < rails; i++) {
-for(j = 0; j < len; j++) {
-if(code[i][j] != 0)
-printf("%c", (char)code[i][j]);
-}
-}
-printf("\n");
-}
-void decryptMessage(char *str, int rails) {
-int i, j, len, count, k, code[100][1000];
-len = strlen(str);
-for(i = 0; i < rails; i++) {
-for(j = 0; j < len; j++) {
-code[i][j] = 0;
-}
-}
-count = 0;
-j = 0;
-while(j < len) {
-if(count % 2 == 0) {
-for(i = 0; i < rails; i++) {
-if(j < len)
-code[i][j] = 1;
-j++;
-}
-} else {
-for(i = rails - 2; i > 0; i--) {
-if(j < len)
-code[i][j] = 1;
-j++;
-}
-}
-count++;
-}
-k = 0;
-for(i = 0; i < rails; i++) {
-for(j = 0; j < len; j++) {
-if(code[i][j] == 1) {
-code[i][j] = (int)str[k];
-k++;
-}
-}
-}
-printf("Decrypted Message: ");
-count = 0;
-j = 0;
-while(j < len) {
-if(count % 2 == 0) {
-for(i = 0; i < rails; i++) {
-if(code[i][j] != 0) {
-printf("%c", (char)code[i][j]);
-j++;
-}
-}
-} else {
-for(i = rails - 2; i > 0; i--) {
-if(code[i][j] != 0) {
-printf("%c", (char)code[i][j]);
-j++;
-}
-}
-}
-count++;
-}
-printf("\n");
-}
-int main() {
-char str[1000];
-int rails, choice;
-printf("Enter a Secret Message\n");
-gets(str);
-printf("Enter number of rails\n");
-scanf("%d", &rails);
-printf("Choose an option:\n");
-printf("1. Encrypt Message\n");
-printf("2. Decrypt Message\n");
-scanf("%d", &choice);
-switch(choice) {
-case 1:
-encryptMessage(str, rails);
-break;
-case 2:
-decryptMessage(str, rails);
-break;
-default:
-printf("Invalid choice\n");
-break;
-}
-return 0;
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+void encrypt(int key, char *pt, char *ct) {
+ int line, i, length = strlen(pt), j = 0, k = 0, skip;
+ for(line =0; line<key-1; line++) {
+ skip = 2 * (key-line-1);
+ k = 0;
+ for(i=line; i<length;) {
+ ct[j] = pt[i];
+ if((line == 0) || (k % 2 == 0)) i+=skip;
+ else i+= 2*(key-1)-skip;
+ j++;
+ k++;
+ } }
+ for(i=line; i<length; i+= 2*(key-1)) ct[j++] = pt[i]; }
+void decrypt(int key, char *ct, char *pt) {
+ int line, i, length = strlen(ct), j, k = 0, skip;
+ for(line =0; line<key-1; line++) {
+ skip = 2 * (key-line-1);
+ j = 0;
+ for(i=line; i<length;) {
+ pt[i] = ct[k++];
+ if((line == 0) || (j % 2 == 0)) i+=skip;
+ else i+= 2*(key-1)-skip;
+ j++;
+ } }
+ for(i=line; i<length; i+= 2*(key-1)) pt[i] = ct[k++]; }
+void main() {
+ char pt[100];
+ int key;
+ printf("Enter the text to encrypt: ");
+ scanf("%[^\n]", pt); // Read up to 99 characters to avoid buffer overflow
+ printf("Enter the key: ");
+ scanf("%d", &key);
+ char *ct = malloc(strlen(pt) + 1);
+ char *res = malloc(strlen(pt) + 1);
+ encrypt(key, pt, ct);
+ decrypt(key, ct, res);
+ printf("Original text: %s \nCipher text: %s \nDecrypted text: %s", pt, ct, res);
+} 
