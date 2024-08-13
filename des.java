@@ -1,3 +1,4 @@
+//Code should be in C language according to the question in syllabus (5. Write a C program to implement DES algorithm.)
 //DES ALGORITHM
 
 import javax.crypto.*;
